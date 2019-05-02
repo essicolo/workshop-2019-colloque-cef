@@ -45,6 +45,16 @@ plot(bones)
 cor(bones)
 ```
 
+Pourtant, si j'utilise des ratios allométriques avec l'humérus comme base,
+
+```{r}
+bones_r <- bones %>% 
+  transmute(fh = femur/humerus,
+            th = tibia/humerus)
+plot(bones_r)
+text(30, 20, paste("corrélation =", round(cor(bones_r$fh, bones_r$th), 2)), col = "blue")
+```
+
 ```{r fig.align="center", echo = FALSE}
 knitr::include_graphics("https://media.giphy.com/media/119bUfqfRYS0Ao/giphy.gif")
 ```
