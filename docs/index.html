@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Analyse de données compositionnelles, biostatistiques et autoapprentissage avec R</title>
+  <meta name="description" content="Notes de conférence pour le 13ième Colloque du CEF">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Analyse de données compositionnelles, biostatistiques et autoapprentissage avec R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Notes de conférence pour le 13ième Colloque du CEF" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Analyse de données compositionnelles, biostatistiques et autoapprentissage avec R" />
+  
+  <meta name="twitter:description" content="Notes de conférence pour le 13ième Colloque du CEF" />
+  
+
+<meta name="author" content="Serge-Étienne Parent">
+
+
+<meta name="date" content="2019-05-01">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+<link rel="next" href="les-biostats-compositionnelles.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> L’analyse compositionnelle</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#contexte"><i class="fa fa-check"></i><b>1.1</b> Contexte</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#les-donnees-compositionnelles"><i class="fa fa-check"></i><b>1.2</b> Les données compositionnelles</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#les-transformations-compositionnelles"><i class="fa fa-check"></i><b>1.3</b> Les transformations compositionnelles</a></li>
+<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#les-zeros"><i class="fa fa-check"></i><b>1.4</b> Les zéros</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="index.html"><a href="index.html#les-zeros-arrondis"><i class="fa fa-check"></i><b>1.4.1</b> Les zéros arrondis</a></li>
+<li class="chapter" data-level="1.4.2" data-path="index.html"><a href="index.html#les-decomptes-de-zero"><i class="fa fa-check"></i><b>1.4.2</b> Les décomptes de zéro</a></li>
+<li class="chapter" data-level="1.4.3" data-path="index.html"><a href="index.html#les-zeros-structurels"><i class="fa fa-check"></i><b>1.4.3</b> Les zéros structurels</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="les-biostats-compositionnelles.html"><a href="les-biostats-compositionnelles.html"><i class="fa fa-check"></i><b>2</b> Les biostats compositionnelles</a></li>
+<li class="chapter" data-level="3" data-path="autoapprentissage-compositionnel.html"><a href="autoapprentissage-compositionnel.html"><i class="fa fa-check"></i><b>3</b> Autoapprentissage compositionnel</a></li>
+<li class="chapter" data-level="4" data-path="liens-utiles.html"><a href="liens-utiles.html"><i class="fa fa-check"></i><b>4</b> Liens utiles</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analyse de données compositionnelles, biostatistiques et autoapprentissage avec R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Analyse de données compositionnelles, biostatistiques et autoapprentissage avec R</h1>
+<p class="author"><em>Serge-Étienne Parent</em></p>
+<p class="date"><em>2019-05-01</em></p>
+</div>
+<div id="lanalyse-compositionnelle" class="section level1">
+<h1><span class="header-section-number">1</span> L’analyse compositionnelle</h1>
+<div id="contexte" class="section level2">
+<h2><span class="header-section-number">1.1</span> Contexte</h2>
+<p>En 1898, le statisticien Karl Pearson nota que des corrélations étaient induites lorsque l’on effectuait des ratios par rapport à une variable commune.</p>
+<div class="figure" style="text-align: center"><span id="fig:pearson1898"></span>
+<img src="images/00_pearson1897.png" alt="Source [Karl Pearson, 1897. Mathematical contributions to the theory of evolution.—on a form of spurious correlation which may arise when indices are used in the measurement of organs. Proceedings of the royal society of London](https://royalsocietypublishing.org/doi/pdf/10.1098/rspl.1896.0076)" width="50%" />
+<p class="caption">
+Figure 1.1: Source <a href="https://royalsocietypublishing.org/doi/pdf/10.1098/rspl.1896.0076">Karl Pearson, 1897. Mathematical contributions to the theory of evolution.—on a form of spurious correlation which may arise when indices are used in the measurement of organs. Proceedings of the royal society of London</a>
+</p>
+</div>
+<p>Faisons l’exercice! Nous générons au hasard 1000 données (comme le proposait Pearson) pour trois dimensions: le fémur, le tibia et l’humérus. Ces dimensions ne sont pas générées par des distributions corrélées.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">3570536</span>)
+n &lt;-<span class="st"> </span><span class="dv">1000</span>
+bones &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">femur =</span> <span class="kw">rnorm</span>(n, <span class="dv">10</span>, <span class="dv">3</span>),
+                <span class="dt">tibia =</span> <span class="kw">rnorm</span>(n, <span class="dv">8</span>, <span class="dv">2</span>),
+                <span class="dt">humerus =</span> <span class="kw">rnorm</span>(n, <span class="dv">6</span>, <span class="dv">2</span>))
+<span class="kw">plot</span>(bones)</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:bivar-os"></span>
+<img src="_main_files/figure-html/bivar-os-1.png" alt="Représentation bivariées de longueur fictives des os, générées au hasard." width="100%" />
+<p class="caption">
+Figure 1.2: Représentation bivariées de longueur fictives des os, générées au hasard.
+</p>
+</div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(bones)</code></pre>
+<pre><code>##                femur        tibia      humerus
+## femur    1.000000000 -0.069006171  0.002652292
+## tibia   -0.069006171  1.000000000 -0.008994704
+## humerus  0.002652292 -0.008994704  1.000000000</code></pre>
+<p>Nous avons induit ce que Pearson appelait une fausse corrélation (<em>spurious correlation</em>). En 1960, <a href="https://doi.org/10.1029/JZ065i012p04185">Chayes</a> proposa que ces fausses corrélations soient induites non seulement sur des ratios de valeurs absolues, mais aussi sur des ratios d’une somme totale. Par exemple, dans une composition simple de deux types d’utilisation du territoire, si une proportion augmente, l’autre doit nécessairement diminuer.</p>
+<pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">30</span>
+<span class="kw">tibble</span>(<span class="dt">A =</span> <span class="kw">runif</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">B =</span> <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>A) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x=</span>A, <span class="dt">y=</span>B)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">coord_equal</span>()</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:coda-2var"></span>
+<img src="_main_files/figure-html/coda-2var-1.png" alt="Complémentarité intrinsèque des données compositionnelles." width="100%" />
+<p class="caption">
+Figure 1.3: Complémentarité intrinsèque des données compositionnelles.
+</p>
+</div>
+</div>
+<div id="les-donnees-compositionnelles" class="section level2">
+<h2><span class="header-section-number">1.2</span> Les données compositionnelles</h2>
+<p>Les variables exprimées relativement à une somme totale sont dites <em>compositionnelles</em>. Les variables compositionnelles peuvent être des concentrations, des décomptes, des dimensions (aires ou volumes), des masses, des dépenses monétaires: en fait, tout ce qui s’exprime en proportions d’un tout. Elles possèdent les caractéristiques suivantes.</p>
+<ol style="list-style-type: decimal">
+<li><strong>Redondance d’information</strong>. Un système de deux proportions ne contient qu’une seule variable du fait que l’on puisse déduire l’une en soutrayant l’autre de la somme totale. Un vecteur compositionnel contient de l’information redondante. Pourtant, effectuer des statistiques sur l’une plutôt que sur l’autre donnera des résultats différents.</li>
+<li><strong>Dépendance d’échelle</strong>. Les statistiques devraient être indépendantes de la somme totale utilisée. Pourtant, elles différeront sur l’on utilise par exemple, une proportion des mâles d’une part et des femelles d’autre part, ou la proportion de la somme des deux, de même que les résultats d’un test sanguin différera si l’on utilise une base sèche ou une base humide.</li>
+<li><strong>Distribution théorique des données</strong>. Étant donnée que les proportions sont confinées entre 0 et 1 (ou 100%, ou une somme totale quelconque), la distribution normale (qui s’étend de -∞ à +∞) n’est souvent pas appropriée. On pourra utiliser la distribution de Dirichlet ou la distribution logitique-normale, mais d’autres approches sont souvent plus pratiques.</li>
+</ol>
+<p>Pour illustrer l’effet de la distribution, voyons un diagramme ternaire incluant le sable, le limon et l’argile. En utilisant des écart-types univariés, nous obtenons l’ellipse en rouge, qui non seulement représente peu l’étalement des données, mais elle dépasse les bornes du triangle, admettant ainsi des proportions négatives. En bleu, la distribution logistique normale (issue des méthodes présentées plus loin dans cette section) convient davantage.</p>
+<div class="figure" style="text-align: center"><span id="fig:ternaire-sd"></span>
+<img src="images/00_ternaire-sd.png" alt="Représentation ternaire d'un écart-type multivarié biaisé (rouge) et non-biaisé (en bleu)." width="50%" />
+<p class="caption">
+Figure 1.4: Représentation ternaire d’un écart-type multivarié biaisé (rouge) et non-biaisé (en bleu).
+</p>
+</div>
+<p>Les conséquences d’effectuer des statistiques linéaires sur des données compositionnelles brutes peuvent être majeures. En outre, <a href="http://dx.doi.org/10.1144/GSL.SP.2006.264.01.01">Pawlowksy-Glahn et Egozcue (2006)</a>, s’appuyant en outre sur Rock (1988), note les problèmes suivants (exprimés en mes mots).</p>
+<ol style="list-style-type: decimal">
+<li>les régressions, les regroupements et les analyses en composantes principales peuvent avoir peu ou pas de signification</li>
+<li>les propriétés des distributions peuvent être générées par l’opération de fermeture de la composition (s’assurer que le total des proportions donne 100%)</li>
+<li>les résultats d’analyses discriminantes linéaires sont propices à être illusoires</li>
+<li>tous les coefficients de corrélation seront affectés à des degrés inconnus</li>
+<li>les résultats des tests d’hypothèses seront intrinsèquement faussés</li>
+</ol>
+<p>Pour contourner ces problèmes, il faut d’abord aborder les données compositionnelles pour ce qu’elles sont: des données intrinsèquement multivariées. Elles sont un nuage de point multidimensionnel, et non pas une collection de variables individuelles. Ceci qui n’empêche pas d’effectuer des analyses consciencieusement sous des angles particuliers.</p>
+<p>Chargeons le module <strong><code>compositions</code></strong> (n’oubliez pas de l’installer au préalable) pour accéder à des données fictives de proportions de sable, limon et argile dans des sédiments.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;compositions&quot;</span>)
+<span class="kw">data</span>(<span class="st">&quot;ArcticLake&quot;</span>)
+ArcticLake &lt;-<span class="st"> </span>ArcticLake <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()
+<span class="kw">head</span>(ArcticLake)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##    sand  silt  clay depth
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  77.5  19.5   3    10.4
+## 2  71.9  24.9   3.2  11.7
+## 3  50.7  36.1  13.2  12.8
+## 4  52.2  40.9   6.6  13  
+## 5  70    26.5   3.5  15.7
+## 6  66.5  32.2   1.3  16.3</code></pre>
+<p>En R, on pourra aisément rapporter une composition en somme unitaire grâce à la fonction <code>base::apply()</code>. Pour information, la fonction <code>base::apply()</code> <em>applique</em> la fonction <code>FUN = x/sum(x)</code> pour toutes les lignes (<code>MARGIN = 1</code>, pour les colonnes, ce serait <code>MARGIN = 2</code>). Les résultats étant rendus sous forme de colonne, on doit finalement transposer (<code>base:t()</code>).</p>
+<pre class="sourceCode r"><code class="sourceCode r">comp &lt;-<span class="st"> </span>ArcticLake <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>depth) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">apply</span>(., <span class="dt">MARGIN =</span> <span class="dv">1</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x) x<span class="op">/</span><span class="kw">sum</span>(x)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">t</span>(.)</code></pre>
+<p>Plus simplement, pourra aussi utiliser la fonction <code>compositions::acomp()</code> (<em>acomp</em> pour Aitchison-composition) pour fermer la composition à une somme de 1.</p>
+<pre class="sourceCode r"><code class="sourceCode r">comp &lt;-<span class="st"> </span>ArcticLake <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>depth) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">acomp</span>(.)
+comp[<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>, ]</code></pre>
+<pre><code>##           sand      silt      clay
+## [1,] 0.7750000 0.1950000 0.0300000
+## [2,] 0.7190000 0.2490000 0.0320000
+## [3,] 0.5070000 0.3610000 0.1320000
+## [4,] 0.5235707 0.4102307 0.0661986
+## [5,] 0.7000000 0.2650000 0.0350000
+## [6,] 0.6650000 0.3220000 0.0130000</code></pre>
+<p>Cette stratégie a pour avantage d’attribuer à la variable <code>comp</code> la classe <code>acomp</code>, qui automatise les opérations dans l’espace compositionnel (que l’on nomme aussi le <em>simplex</em>). Notamment, la représentation ternaire est souvent utilisée pour présenter des compositions. Toutefois, il est difficile d’interpréter les compositions de plus de trois parties. La classe <code>acomp</code> automatise aussi la représentation teranaire.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(comp)</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:tern-arcticlake"></span>
+<img src="_main_files/figure-html/tern-arcticlake-1.png" alt="Représentation ternaire d'une composition granulométrique." width="100%" />
+<p class="caption">
+Figure 1.5: Représentation ternaire d’une composition granulométrique.
+</p>
+</div>
+</div>
+<div id="les-transformations-compositionnelles" class="section level2">
+<h2><span class="header-section-number">1.3</span> Les transformations compositionnelles</h2>
+<p>Afin de transposer cet espace clôt entre 0 et 1 en un espace ouvert de <span class="math inline">\(-\infty\)</span> à <span class="math inline">\(+\infty\)</span>, on pourra diviser chaque proportion par une proportion de référence choisie parmi n’importe quelle proportion. Du coup, on retire une dimension redondante! En utilisant le log du ratio, l’inverse du ratio ne sera qu’un changement de signe, ce qui est pratique en statistiques linéaries. Cette solution, proposée par Aitchison (1986), est valide peu importe le nombre d’éléments formant la compositions. Pour une composition de <span class="math inline">\(A\)</span>, <span class="math inline">\(B\)</span>, <span class="math inline">\(C\)</span>, <span class="math inline">\(D\)</span> et <span class="math inline">\(E\)</span>:</p>
+<p><span class="math display">\[alr_A = log \left( \frac{A}{E} \right), alr_B = log \left( \frac{B}{E} \right), alr_C = log \left( \frac{C}{E} \right), alr_D = log \left( \frac{D}{E} \right)\]</span></p>
+<p>Dans R, la colonne de référence est par défaut la <strong>dernière colonne de la matrice des compositions</strong>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">add_lr &lt;-<span class="st"> </span><span class="kw">alr</span>(comp)</code></pre>
+<p>Cette dernière stratégie se nomme les <strong>log-ratios additifs</strong> (<span class="math inline">\(alr\)</span> pour <em>additive log-ratio</em>). Bien que valide pour effectuer des tests statistiques, cette stratégie a le désavantage de dépendre de la décision arbitraire de la composante à utiliser au numérateur. Deuxième restriction des <em>alr</em>: les axes de l’espace des <em>alr</em> n’étant pas orthogonaux, ils ne peuvent pas être utilisés pour effectuer des statistiques basées sur les distances euclidiennes étant donnée que la distance entre les points dépend de la variable choisie comme dénominateur commun.</p>
+<pre class="sourceCode r"><code class="sourceCode r">add_lr_switch &lt;-<span class="st"> </span><span class="kw">alr</span>(comp[, <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">1</span>)])
+<span class="kw">dist</span>(<span class="kw">unclass</span>(add_lr[<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>, ]), <span class="dt">method =</span> <span class="st">&quot;euclidean&quot;</span>)</code></pre>
+<pre><code>##           1         2         3         4         5
+## 2 0.2276858                                        
+## 3 2.0933591 2.0527035                              
+## 4 1.1846152 1.0686434 1.0912475                    
+## 5 0.2979638 0.1195600 1.9389490 0.9491006          
+## 6 1.5021428 1.4204061 3.3998698 2.3248142 1.5121727</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dist</span>(<span class="kw">unclass</span>(add_lr_switch[<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>, ]), <span class="dt">method =</span> <span class="st">&quot;euclidean&quot;</span>)</code></pre>
+<pre><code>##           1         2         3         4         5
+## 2 0.3486014                                        
+## 3 2.1713475 1.9078113                              
+## 4 1.6405267 1.3254326 0.7286134                    
+## 5 0.4820630 0.1465561 1.7668173 1.1788856          
+## 6 0.9461828 0.8883672 2.6176853 1.9278663 0.9708201</code></pre>
+<p>Les statistiques linéaires sont toutefois les mêmes peu importe le dénominateur commun: elles seront seulement exprimées selon les axes définis par la composition de référence (dénominateur commum).</p>
+<p>Une stratégie proposée par Aitchison qui permet la mesure de distances euclidienne est d’effectuer un log-ratio entre chaque composante et la moyenne géométrique de toutes les composantes. Cette transformation se nomme le <strong>log-ratio centré</strong> (<span class="math inline">\(clr\)</span>, pour <em>centered log-ratio</em>)</p>
+<p><span class="math display">\[clr_i = log \left( \frac{x_i}{g \left( x \right)} \right)\]</span></p>
+<p>En R,</p>
+<pre class="sourceCode r"><code class="sourceCode r">cen_lr &lt;-<span class="st"> </span><span class="kw">clr</span>(comp)</code></pre>
+<p>Avec des CLRs, les distances sont valides. Mais… nous restons avec le problème de la redondance d’information. En fait, la somme de chacunes des lignes d’une matrice de clr est de 0. Pas très pratique lorsque l’on effectue des statistiques incluant une inversion de la matrice de covariance (distance de Mahalanobis, géostatistiques, etc.)</p>
+<pre><code>cen_lr %&gt;%
+  cov() %&gt;%
+  solve()
+ Error in solve.default(.) : le système est numériquement singulier : conditionnement de la réciproque = 4.44407e-17</code></pre>
+<p>Enfin, une autre méthode de transformation développée par Egoscue et al. (2003), les log-ratios isométriques (ou <em>isometric log-ratios, ilr</em>) projette les compositions comprenant D composantes dans un espace restreint de D-1 dimensions orthonormées. Ces dimensions doivent doivent être préalablement établie dans un dendrogramme de bifurcation, où chaque composante ou groupe de composante est successivement divisé en deux embranchement. La manière d’arranger ces balances importe peu, mais on aura avantage à créer des balances interprétables.</p>
+<p>Le diagramme de balances peut être encodé dans une partition binaire séquentielle (ou <em>sequential bianry partition, sbp</em>). Une <em>sbp</em> est une matrice de contrastes orthogonaux ou chaque ligne représente une partition entre deux variables ou groupes de variables. Une composante étiquettée <code>+1</code> correspondra au groupe du numérateur, une composante étiquettée <code>-1</code> au dénominateur et une composante étiquettée <code>0</code> sera exclue de la partition (<a href="http://dx.doi.org/10.3389/fpls.2013.00039">Parent et al., 2013</a>). J’ai reformulé la fonction CoDaDendrogram pour que l’on puisse ajouter des informations intéressantes sur les balants horizontaux. Cette fonction est disponible sur github.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;https://raw.githubusercontent.com/essicolo/AgFun/master/codadend2.R&quot;</span>)
+
+sbp &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,
+                <span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>),
+              <span class="dt">byrow =</span> <span class="ot">TRUE</span>,
+              <span class="dt">ncol =</span> <span class="dv">3</span>)
+
+<span class="kw">CoDaDendrogram2</span>(comp,
+                <span class="dt">V =</span> <span class="kw">gsi.buildilrBase</span>(<span class="kw">t</span>(sbp)),
+                <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),
+                <span class="dt">equal.height =</span> <span class="ot">TRUE</span>,
+                <span class="dt">type =</span> <span class="st">&quot;boxplot&quot;</span>,
+                <span class="dt">group =</span> <span class="kw">cut</span>(ArcticLake<span class="op">$</span>depth, <span class="dv">3</span>))</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:coda-dendrogram"></span>
+<img src="_main_files/figure-html/coda-dendrogram-1.png" alt="Dendrogramme compositionnel: de la surface (rouge) vers la profondeur (bleu)." width="100%" />
+<p class="caption">
+Figure 1.6: Dendrogramme compositionnel: de la surface (rouge) vers la profondeur (bleu).
+</p>
+</div>
+<p>Si la SBP est plus imposante (la précédente n’a que trois composantes, mais en pratique il y en a souvent davantage), il pourrait être plus aisé de monter dans un chiffrier, puis de l’importer dans R via un fichier csv.</p>
+<p>Le calcul des ILRs est effectué comme suit.</p>
+<p><span class="math display">\[ilr_j = \sqrt{\frac{n_j^+ n_j^-}{n_j^+ + n_j^-}} log \left( \frac{g \left( c_j^+ \right)}{g \left( c_j^+ \right)} \right)\]</span></p>
+<p>où, à la ligne <span class="math inline">\(j\)</span> de la SBP, <span class="math inline">\(n_j^+\)</span> et <span class="math inline">\(n_j^-\)</span> sont respectivement le nombre de composantes au numérateur et au dénominateur, <span class="math inline">\(g \left( c_j^+ \right)\)</span> est la moyenne géométrique des composantes au numérateur et <span class="math inline">\(g \left( c_j^- \right)\)</span> est la moyenne géométrique des composantes au dénominateur.</p>
+<p>Les balances sont conventionnellement notées <code>[A,B | C,D]</code>, ou les composantes <code>A</code> et <code>B</code> au dénominateur sont balancées avec les composantes <code>C</code> and <code>D</code> au numérateur. Une balance positive signifie que la moyenne géométrique des concentrations au numérateur est supérieur à celle au dénominateur, et inversement, alors qu’une balance nulle signifie que les moyennes géométriques sont égales (équilibre). Ainsi, en modélisation linéaire, un coefficient positif sur <code>[A,B | C,D]</code> signifie que l’augmentation de l’importance de <code>C</code> et <code>D</code> comparativement à <code>A</code> et <code>B</code> est associé à une augmentation de la variable réponse du modèle.</p>
+<p>En R,</p>
+<pre class="sourceCode r"><code class="sourceCode r">iso_lr &lt;-<span class="st"> </span><span class="kw">ilr</span>(comp, <span class="dt">V =</span> <span class="kw">gsi.buildilrBase</span>(<span class="kw">t</span>(sbp)))</code></pre>
+<p>Notez la forme <code>gsi.buildilrBase(t(sbp))</code> est une opération pour obtenir la matrice d’orthonormalité à partir de la SBP.</p>
+<p>Les ILRs sont des balances multivariées sur lesquelles on pourra effectuer des statistiques linéaries. Bien que l’interprétation des résultats comme collection d’interprétations sur des balances univariées pourra être affectée par la structure de la SBP, ni les statistiques linéaires multivariées, ni la distance entre les points ne seront affectés. En effet, chaque variante de la SBP est une rotation (d’un facteur de 60°) par rapport à l’origine:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;lib/ilr-rotation-sbp.R&quot;</span>)</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:ilr-rotation"></span>
+<img src="images/00_ilr-rotation.png" alt="Rotation des axes obtenus selon trois SBP différentes." width="100%" />
+<p class="caption">
+Figure 1.7: Rotation des axes obtenus selon trois SBP différentes.
+</p>
+</div>
+<p>Pour les transformations inverses, c’est-à-dire pour passer de données transformées à des données exprimées dans l’échelle originale, vous pourrez utiliser les fonctions <code>alrInv</code>, <code>clrInv</code> et <code>ilrInv</code>. Dans tous les cas, si vous tenez à garder la trace de vos données dans leur format original, vous aurez avantage à ajouter à votre vecteur compositionnel la valeur de remplissage, constitué d’un amalgame des composantes non mesurées. Par exemple,</p>
+<pre class="sourceCode r"><code class="sourceCode r">pourc &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">N =</span> <span class="fl">0.03</span>, <span class="dt">P =</span> <span class="fl">0.001</span>, <span class="dt">K =</span> <span class="fl">0.01</span>)
+<span class="kw">acomp</span>(pourc) <span class="co"># vous perdez la trace des proportions originales</span></code></pre>
+<pre><code>##          N          P          K 
+## 0.73170732 0.02439024 0.24390244 
+## attr(,&quot;class&quot;)
+## [1] acomp</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">pourc &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">N =</span> <span class="fl">0.03</span>, <span class="dt">P =</span> <span class="fl">0.001</span>, <span class="dt">K =</span> <span class="fl">0.01</span>)
+Fv &lt;-<span class="st"> </span><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">sum</span>(pourc)
+comp &lt;-<span class="st"> </span><span class="kw">acomp</span>(<span class="kw">c</span>(pourc, <span class="dt">Fv =</span> Fv))
+comp</code></pre>
+<pre><code>##     N     P     K    Fv 
+## 0.030 0.001 0.010 0.959 
+## attr(,&quot;class&quot;)
+## [1] acomp</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">iso_lr &lt;-<span class="st"> </span><span class="kw">ilr</span>(comp) <span class="co"># avec une sbp par défaut</span>
+<span class="kw">ilrInv</span>(iso_lr)</code></pre>
+<pre><code>##      1    2     3    4    
+## [1,] 0.03 0.001 0.01 0.959
+## attr(,&quot;class&quot;)
+## [1] acomp</code></pre>
+</div>
+<div id="les-zeros" class="section level2">
+<h2><span class="header-section-number">1.4</span> Les zéros</h2>
+<p>Les proportions négatives ou plus imposantes que le tout sont exclues. De même, une proportion de 100%, occupant tout le simplex, implique que les proportions complémentaires soient nulles. Or, le log de 0 est <span class="math inline">\(-\infty\)</span>, ce qui dispose de la possibilité d’effectuer des transformations logarithmiques. En fait, les données compositionnelles sont exprimées <em>entre</em> 0 et la somme totale, ce qui exclut la possibilité d’obtenir des proportions de 0% ou de 100%. Or, il arrive souvent qu’un tableau de données inclut des 0. Dans ce cas, on doit mener une réflexion sur la nature des valeurs nulles.</p>
+<div id="les-zeros-arrondis" class="section level3">
+<h3><span class="header-section-number">1.4.1</span> Les zéros arrondis</h3>
+<p>Arrondissez 0.01 à une seule décimale et vous obtiendrez 0.0. Ou bien, mesurez une concentration de 0.01 avec un appareil dont le seuil de détection est 0.1, vous obtiendrez encore 0.0. Étant des valeurs qui ne peuvent être observées pour des raisons méthodologiques, les zéros arrondis sont équivalents à des valeurs manquantes non aléatoires (<a href="https://onlinelibrary.wiley.com/doi/10.1002/9781119976462.ch4">Martin-Fernandez et al., 2011</a>). Il existe plusieurs manières de remplacer ces zéros par une valeur attendue. La méthode la plus simple est de remplacer les zéros par une proportion du seuil de détection, par exemple 65% (<a href="https://link.springer.com/article/10.1023%2FA%3A1023866030544">Martin-Fernandez et al., 2003</a>).</p>
+<p>Chargeons d’abord des données fictives.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;zCompositions&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">542353</span>)
+<span class="kw">data</span>(LPdata)
+rows &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(LPdata), <span class="dv">3</span>)
+LPdata[rows, ]</code></pre>
+<pre><code>##      Cr  B   P  V  Cu   Ti   Ni  Y Sr La  Ce Ba Li     K Rb
+## 38 27.5 17 148 29 2.7 4335  0.0 17 24  8 163 74 30  9703 48
+## 3  30.4 23 433 42 3.8 3305 16.6 22 59 14 240 75 80 12209 53
+## 79 25.6 14 135 33 0.0 3925 14.2 20 18  9  97 36 77  3319 41</code></pre>
+<p>Si le seuil de détection est de 1 pour toutes les colonnes,</p>
+<pre class="sourceCode r"><code class="sourceCode r">LPdata_z &lt;-<span class="st"> </span>LPdata
+LPdata_z[LPdata <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span><span class="fl">0.65</span>
+LPdata_z[rows, ]</code></pre>
+<pre><code>##      Cr  B   P  V   Cu   Ti    Ni  Y Sr La  Ce Ba Li     K Rb
+## 38 27.5 17 148 29 2.70 4335  0.65 17 24  8 163 74 30  9703 48
+## 3  30.4 23 433 42 3.80 3305 16.60 22 59 14 240 75 80 12209 53
+## 79 25.6 14 135 33 0.65 3925 14.20 20 18  9  97 36 77  3319 41</code></pre>
+<p>Par exemple, le remplacement multiplicatif simple incluse dans le module <strong><code>zCompositions</code></strong>, dont la mathématique varie légèrement.</p>
+<pre class="sourceCode r"><code class="sourceCode r">LPdata_z &lt;-<span class="st"> </span><span class="kw">multRepl</span>(LPdata, <span class="dt">dl =</span> <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">ncol</span>(LPdata)), <span class="dt">delta =</span> <span class="fl">0.65</span>, <span class="dt">label =</span> <span class="dv">0</span>)
+LPdata_z[rows, ]</code></pre>
+<pre><code>##      Cr  B   P  V        Cu   Ti         Ni  Y Sr La  Ce Ba Li     K Rb
+## 38 27.5 17 148 29 2.7000000 4335  0.6500289 17 24  8 163 74 30  9703 48
+## 3  30.4 23 433 42 3.8000000 3305 16.6000000 22 59 14 240 75 80 12209 53
+## 79 25.6 14 135 33 0.6500544 3925 14.2000000 20 18  9  97 36 77  3319 41</code></pre>
+</div>
+<div id="les-decomptes-de-zero" class="section level3">
+<h3><span class="header-section-number">1.4.2</span> Les décomptes de zéro</h3>
+<p>Vous décomptez des espèces sur une parcelle ou bien séquencez des OTU (<em>operational taxonomy units</em>, qui peuvent être interprétés - avec une précaution bioinformaticienne - comme des espèces): certaines espèces ne seront pas observées, bien que leur occurence puisse être attendue. Si vous vous intéressez davantage aux proportions d’espèces qu’à leur décompte absolu, vous devriez transformer vos données avec les technique présentées ci-dessus. De même que précédemment, la non observation d’un décompte peut provienir de contraintes méthodologiques: parcelle trop petite, temps d’observation trop court, ou quoi qui pourrait incluencer la non observation d’une fréquence rare. Par exemple, les décomptes de cochons occupés à différentes activités.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">30147</span>)
+<span class="kw">data</span>(Pigs)
+rows &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(Pigs), <span class="dv">3</span>)
+Pigs[rows, ]</code></pre>
+<pre><code>##    BED HALF.BED PASSAGE HALF.PASS FEEDER HALF.FEED
+## 19  83        1       9         1      3         0
+## 15  68        1      16         1     10         1
+## 18  69        0      26         0      2         0</code></pre>
+<p>En ces circonstances, il est possible de remplacer les zéros par des méthodes bayésiennes. Les données sont du coup transformées en proportions.</p>
+<pre class="sourceCode r"><code class="sourceCode r">Pigs_z &lt;-<span class="st"> </span><span class="kw">cmultRepl</span>(Pigs, <span class="dt">method =</span> <span class="st">&quot;CZM&quot;</span>) <span class="co"># CZM: count zero multiplicative</span>
+Pigs_z[rows, ]</code></pre>
+<pre><code>##          BED    HALF.BED    PASSAGE   HALF.PASS     FEEDER   HALF.FEED
+## 19 0.8528032 0.010274737 0.09247263 0.010274737 0.03082421 0.003350515
+## 15 0.7010309 0.010309278 0.16494845 0.010309278 0.10309278 0.010309278
+## 18 0.7041901 0.003350515 0.26534701 0.003350515 0.02041131 0.003350515</code></pre>
+<p>Dans le cas des OTU, il arrive souvent d’obtenir au-dessus de 90% de zéros. Une option est de regrouper (amalgamer) autant que possible les OTU en taxons d’ordre supérieurs.</p>
+</div>
+<div id="les-zeros-structurels" class="section level3">
+<h3><span class="header-section-number">1.4.3</span> Les zéros structurels</h3>
+<p>Il peut arriver que les zéros soient générés par les mécanismes étudiés, non pas des erreurs de mesure. Par exemple, certaines espèces peuvent ne pas occuper certaines aires cadrillées parce qu’elles sont structurellement exclues de leur niche écologique (une épinette dans un lac ou la proportion de viande au menu d’une famille véganne). Pour ce type de zéro, il n’y a pas de réponse facile. De même que précédemment, il pourrait être possible de procéder à l’amalgamation. Une méthode conviviale est de séparer l’analyse en différents groupes (par exemple, on décompte généralement des espèces différentes sur terre et dans un lac).</p>
+<p>Si vos données font partie d’un tout, je vous recommande chaudement d’utiliser des méthodes compositionnelles autant pour l’analyse que la modélisation. Pour en savoir davantage, le livre <em>Compositional data analysis with R</em>, de <a href="https://doi.org/10.1007/978-3-642-36809-7">van den Boogart et Tolosana-Delgado (2013)</a> pourra vous guider, quoi que je recommande davantage le plus récent et à mon avis mieux vulgarisé [<em>Applied Compositional Data Analysis With Worked Examples in R</em>], de <a href="https://doi.org/10.1007/978-3-319-96422-5">Filzmoser et al. (2018)</a>.</p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="les-biostats-compositionnelles.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
