@@ -180,6 +180,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="lanalyse-compositionnelle" class="section level1">
 <h1><span class="header-section-number">1</span> L’analyse compositionnelle</h1>
+<p><img src="https://media.giphy.com/media/frijtwtnqA9RC/giphy.gif" style="display: block; margin: auto;" /></p>
+<p>Non-non, Bugs. Nous n’allons pas composer de la musique, mais apprendre à transformer des données qui font partie d’un tout.</p>
+<p><img src="https://media.giphy.com/media/zbzyZ1E8W4IGA/giphy.gif" style="display: block; margin: auto;" /></p>
+<p>Oh non, Bugs. Nous n’allons pas travailler sur la portée, mais bien en langage R. Par ailleurs, les fichiers de calculs qui génèrent ces notes sont <a href="https://github.com/essicolo/workshop-2019-colloque-cef">disponibles sur GitHub</a>.</p>
 <div id="contexte" class="section level2">
 <h2><span class="header-section-number">1.1</span> Contexte</h2>
 <p>En 1898, le statisticien Karl Pearson nota que des corrélations étaient induites lorsque l’on effectuait des ratios par rapport à une variable commune.</p>
@@ -208,7 +212,8 @@ Figure 1.2: Représentation bivariées de longueur fictives des os, générées 
 ## femur    1.000000000 -0.069006171  0.002652292
 ## tibia   -0.069006171  1.000000000 -0.008994704
 ## humerus  0.002652292 -0.008994704  1.000000000</code></pre>
-<p>Nous avons induit ce que Pearson appelait une fausse corrélation (<em>spurious correlation</em>). En 1960, <a href="https://doi.org/10.1029/JZ065i012p04185">Chayes</a> proposa que ces fausses corrélations soient induites non seulement sur des ratios de valeurs absolues, mais aussi sur des ratios d’une somme totale. Par exemple, dans une composition simple de deux types d’utilisation du territoire, si une proportion augmente, l’autre doit nécessairement diminuer.</p>
+<p><img src="https://media.giphy.com/media/119bUfqfRYS0Ao/giphy.gif" style="display: block; margin: auto;" /></p>
+<p>Pas de panique, Bugs. Nous avons induit ce que Pearson appelait une fausse corrélation (<em>spurious correlation</em>). En 1960, <a href="https://doi.org/10.1029/JZ065i012p04185">Chayes</a> proposa que ces fausses corrélations soient induites non seulement sur des ratios de valeurs absolues, mais aussi sur des ratios d’une somme totale. Par exemple, dans une composition simple de deux types d’utilisation du territoire, si une proportion augmente, l’autre doit nécessairement diminuer.</p>
 <pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="dv">30</span>
 <span class="kw">tibble</span>(<span class="dt">A =</span> <span class="kw">runif</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">B =</span> <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>A) <span class="op">%&gt;%</span>
@@ -246,7 +251,7 @@ Figure 1.4: Représentation ternaire d’un écart-type multivarié biaisé (rou
 <li>les résultats des tests d’hypothèses seront intrinsèquement faussés</li>
 </ol>
 <p>Pour contourner ces problèmes, il faut d’abord aborder les données compositionnelles pour ce qu’elles sont: des données intrinsèquement multivariées. Elles sont un nuage de point multidimensionnel, et non pas une collection de variables individuelles. Ceci qui n’empêche pas d’effectuer des analyses consciencieusement sous des angles particuliers.</p>
-<p>Chargeons le module <strong><code>compositions</code></strong> (n’oubliez pas de l’installer au préalable) pour accéder à des données fictives de proportions de sable, limon et argile dans des sédiments.</p>
+<p>Chargeons le module <strong><code>compositions</code></strong> (n’oubliez pas de l’installer au préalable) pour accéder à des données fictives de proportions de sable, limon et argile dans des sédiments. Notez que j’utiliserai la programmation en pipelines typique de <strong><code>tidyverse</code></strong>.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;compositions&quot;</span>)
 <span class="kw">data</span>(<span class="st">&quot;ArcticLake&quot;</span>)
 ArcticLake &lt;-<span class="st"> </span>ArcticLake <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()
@@ -355,6 +360,9 @@ Figure 1.6: Dendrogramme compositionnel: de la surface (rouge) vers la profondeu
 Figure 1.7: Rotation des axes obtenus selon trois SBP différentes.
 </p>
 </div>
+<p>En somme, la transformation par log-ratio consiste à exploser les données dans un espace libéré des contraintes compositionnelles.</p>
+<p><img src="https://media.giphy.com/media/24FCRwxlrG5oENbaju/giphy.gif" style="display: block; margin: auto;" /></p>
+<p>C’est exactement ça, Bugs!</p>
 <p>Pour les transformations inverses, c’est-à-dire pour passer de données transformées à des données exprimées dans l’échelle originale, vous pourrez utiliser les fonctions <code>alrInv</code>, <code>clrInv</code> et <code>ilrInv</code>. Dans tous les cas, si vous tenez à garder la trace de vos données dans leur format original, vous aurez avantage à ajouter à votre vecteur compositionnel la valeur de remplissage, constitué d’un amalgame des composantes non mesurées. Par exemple,</p>
 <pre class="sourceCode r"><code class="sourceCode r">pourc &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">N =</span> <span class="fl">0.03</span>, <span class="dt">P =</span> <span class="fl">0.001</span>, <span class="dt">K =</span> <span class="fl">0.01</span>)
 <span class="kw">acomp</span>(pourc) <span class="co"># vous perdez la trace des proportions originales</span></code></pre>

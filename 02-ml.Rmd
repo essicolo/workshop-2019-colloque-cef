@@ -47,6 +47,8 @@ Nous ne couvrirons pas la phase de déploiement d'un modèle. Notons seulement q
 Plusieurs options sont disponibles. Je vais introduire le module **`caret`** de R a été conçu pour donner accès à des centaines de fonctions d'autoapprentissage via une interface commune.
 
 ```{r, message=FALSE}
+library("tidyverse")
+library("compositions")
 library("caret")
 ```
 
@@ -54,7 +56,13 @@ Pour cet atelier, nous allons couvrir les *k* plus proches voisins et les proces
 
 ## Les *k* plus proches voisins
 
-Le principe des KNN (*k-nearest neighbors*: un objet va ressembler à ce qui se trouve dans son voisinage. Les KNN se basent en effet sur une métrique de distance pour rechercher un nombre *k* de points situés à proximité de la mesure. Les *k* points les plus proches sont retenus, *k* étant un entier non nul à optimiser. Un autre paramètre parfois utilisé est la distance maximale des voisins à considérer: un voisin trop éloigné pourra être discarté. La réponse attribuée à la mesure est calculée à partir de la réponse des *k* voisins retenus. Dans le cas d'une régression, on utiliser généralement la moyenne. Dans le cas de la classification, la mesure prendra la catégorie qui sera la plus présente chez les *k* plus proches voisins. La métrique de distance devient importante et une standardisation des données (par exemple soustraire la moyenne, puis diviser par l'écart-type) est généralement nécessaire en prétraitement. Pour ce qui est des données compositionnelles, on pourra tirer profit de la métrique d'Aitchison en calculant les distances euclidienne sur des données transformées par *clr* ou *ilr*.
+Le principe des KNN (*k-nearest neighbors*: un objet va ressembler à ce qui se trouve dans son voisinage.
+
+```{r fig.align="center", echo = FALSE}
+knitr::include_graphics("https://media.giphy.com/media/4esrzplOvKkE0/giphy.gif")
+```
+
+Les KNN se basent en effet sur une métrique de distance pour rechercher un nombre *k* de points situés à proximité de la mesure. Les *k* points les plus proches sont retenus, *k* étant un entier non nul à optimiser. Un autre paramètre parfois utilisé est la distance maximale des voisins à considérer: un voisin trop éloigné pourra être discarté. La réponse attribuée à la mesure est calculée à partir de la réponse des *k* voisins retenus. Dans le cas d'une régression, on utiliser généralement la moyenne. Dans le cas de la classification, la mesure prendra la catégorie qui sera la plus présente chez les *k* plus proches voisins. La métrique de distance devient importante et une standardisation des données (par exemple soustraire la moyenne, puis diviser par l'écart-type) est généralement nécessaire en prétraitement. Pour ce qui est des données compositionnelles, on pourra tirer profit de la métrique d'Aitchison en calculant les distances euclidienne sur des données transformées par *clr* ou *ilr*.
 
 ### Exemple d'application
 
@@ -126,13 +134,17 @@ table(Observed = veggies_tr$Culture, Predicted = pred_tr)
 table(Observed = veggies_te$Culture, Predicted = pred_te)
 ```
 
-Les espèces sont toutes classées en entraînement, mais quelques rares erreurs surviennent en test.
+Les espèces sont toutes classées en entraînement, mais quelques rares erreurs surviennent en test. Pas mal comme classement!
+
+```{r fig.align="center", echo = FALSE}
+knitr::include_graphics("https://media.giphy.com/media/KxVA4LQTFJp7y/giphy.gif")
+```
 
 ## Les processus gaussiens
 
 Les prédictions que nous avons obtenues des KNN sont des catégories, mais on aurait pu aussi prédire des nombres réels. Dans les cas où la crédibilité de la réponse est importante, il devient pertinent que la sortie soit probabiliste: les prédictions seront alors présentées sous forme de distributions de probabilité. Les **processus gaussiens** snt en mesure de prédire des distributions (prédictions probabilistes).
 
-Le principe des processus gaussiens est, à l'aide d'une matrice de covariance qui doit être définie (que l'on nomme le noyau), de générer une distribution multinormale, puis d'en sortir une distribution conditionnée sur les observations. Le processus est semblable à la modélisation de la variance courrament utilisée en géostatistiques. Pour plus de détails, référez-vous aux notes du cours [*Anayse et modélisation d'agroécosystèmes*](https://essicolo.github.io/ecologie-mathematique-R/chapitre-ml.html). Retenez seulement que (1) la matrice de covariance a une influence capitale et que (2) vous devez standardiser (centrer et réduire) vos entrées et vos réponses.
+Le principe des processus gaussiens (*gaussian processes*, GP) est de générer une distribution multinormale (comprenant théoriquement une infinité de dimensions) à l'aide d'une matrice de covariance qui doit être définie (que l'on nomme le noyau) et d'un vecteur de moyenne (normalement composés de zéros pour une variable-réponse centrée), puis d'en sortir une distribution a posteriori conditionnée sur les observations. Les GP sont semblables à la modélisation de la variance courrament utilisée en géostatistiques. Pour plus de détails, référez-vous aux notes du cours [*Anayse et modélisation d'agroécosystèmes*](https://essicolo.github.io/ecologie-mathematique-R/chapitre-ml.html). Pour l'instant, retenez que (1) la matrice de covariance a une influence capitale et que (2) vous devez préférablement standardiser (centrer et réduire) vos entrées et nécessairement vos réponses.
 
 ### Exemple d'application
 
@@ -164,8 +176,6 @@ meuse_coord %>% head()
 ```
 
 À partir des coordonnées, nous pouvons grâce à `ggmap::get_stamenmap` effectuer une requête pour télécherger les tuiles d'un fond de carte, sur lesquels nous affichons nous concentrations en zinc.
-
-
 
 ```{r map-zinc-observations, out.width="100%", fig.align="center", fig.cap="Mesures de concentration en zinc dans les sols d'une rive de la rivière Meuse", message=FALSE}
 meuse_map <- get_stamenmap(bbox = c(left = 5.716, right = 5.767, bottom = 50.95, top = 51),
@@ -289,7 +299,6 @@ meuse_grid_coord <- meuse_grid %>%
   rename(x = "X", y = "Y")
 ```
 
-
 Effectuons les prédictions des *ilr* sur la grille.
 
 ```{r}
@@ -360,3 +369,10 @@ gg_zn <- ggmap(meuse_map) +
 
 cowplot::plot_grid(gg_cd, gg_cu, gg_pb, gg_zn, ncol = 2)
 ```
+
+
+```{r fig.align="center", echo = FALSE}
+knitr::include_graphics("https://media.giphy.com/media/wFxEA22DwZUmk/giphy.gif")
+```
+
+Tu as raison, Bugs. Ça suffit pour aujourd'hui.

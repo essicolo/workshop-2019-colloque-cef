@@ -224,12 +224,16 @@ Figure 3.1: Schéma décisionnel des algorithmes pertinents. Source: <a href="ht
 <div id="lautoapprentissage-en-r" class="section level2">
 <h2><span class="header-section-number">3.4</span> L’autoapprentissage en R</h2>
 <p>Plusieurs options sont disponibles. Je vais introduire le module <strong><code>caret</code></strong> de R a été conçu pour donner accès à des centaines de fonctions d’autoapprentissage via une interface commune.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;caret&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;tidyverse&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;compositions&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;caret&quot;</span>)</code></pre>
 <p>Pour cet atelier, nous allons couvrir les <em>k</em> plus proches voisins et les processus gaussiens.</p>
 </div>
 <div id="les-k-plus-proches-voisins" class="section level2">
 <h2><span class="header-section-number">3.5</span> Les <em>k</em> plus proches voisins</h2>
-<p>Le principe des KNN (<em>k-nearest neighbors</em>: un objet va ressembler à ce qui se trouve dans son voisinage. Les KNN se basent en effet sur une métrique de distance pour rechercher un nombre <em>k</em> de points situés à proximité de la mesure. Les <em>k</em> points les plus proches sont retenus, <em>k</em> étant un entier non nul à optimiser. Un autre paramètre parfois utilisé est la distance maximale des voisins à considérer: un voisin trop éloigné pourra être discarté. La réponse attribuée à la mesure est calculée à partir de la réponse des <em>k</em> voisins retenus. Dans le cas d’une régression, on utiliser généralement la moyenne. Dans le cas de la classification, la mesure prendra la catégorie qui sera la plus présente chez les <em>k</em> plus proches voisins. La métrique de distance devient importante et une standardisation des données (par exemple soustraire la moyenne, puis diviser par l’écart-type) est généralement nécessaire en prétraitement. Pour ce qui est des données compositionnelles, on pourra tirer profit de la métrique d’Aitchison en calculant les distances euclidienne sur des données transformées par <em>clr</em> ou <em>ilr</em>.</p>
+<p>Le principe des KNN (<em>k-nearest neighbors</em>: un objet va ressembler à ce qui se trouve dans son voisinage.</p>
+<p><img src="https://media.giphy.com/media/4esrzplOvKkE0/giphy.gif" style="display: block; margin: auto;" /></p>
+<p>Les KNN se basent en effet sur une métrique de distance pour rechercher un nombre <em>k</em> de points situés à proximité de la mesure. Les <em>k</em> points les plus proches sont retenus, <em>k</em> étant un entier non nul à optimiser. Un autre paramètre parfois utilisé est la distance maximale des voisins à considérer: un voisin trop éloigné pourra être discarté. La réponse attribuée à la mesure est calculée à partir de la réponse des <em>k</em> voisins retenus. Dans le cas d’une régression, on utiliser généralement la moyenne. Dans le cas de la classification, la mesure prendra la catégorie qui sera la plus présente chez les <em>k</em> plus proches voisins. La métrique de distance devient importante et une standardisation des données (par exemple soustraire la moyenne, puis diviser par l’écart-type) est généralement nécessaire en prétraitement. Pour ce qui est des données compositionnelles, on pourra tirer profit de la métrique d’Aitchison en calculant les distances euclidienne sur des données transformées par <em>clr</em> ou <em>ilr</em>.</p>
 <div id="exemple-dapplication" class="section level3">
 <h3><span class="header-section-number">3.5.1</span> Exemple d’application</h3>
 <p>L’ionome foliaire est la concentration en éléments d’une feuille: ce sont des données compositionnelles. Nous allons prédire une espèce fictive à partir de son ionome seulement (si d’autres variables étaient intégrées à la prédiction, il faudrait standardiser les données).</p>
@@ -257,8 +261,6 @@ veggies_ilr &lt;-<span class="st"> </span>veggies <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">ilr</span>(., <span class="dt">V =</span> <span class="kw">gsi.buildilrBase</span>(<span class="kw">t</span>(sbp))) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Culture =</span> veggies<span class="op">$</span>Culture)</code></pre>
-<pre><code>## Warning: Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `tibble::enframe(name = NULL)` instead.
-## This warning is displayed once per session.</code></pre>
 <p>Séparons les données en entraînement (<code>_tr</code>) et en test (<code>_te</code>) en utilisant la fonction <code>caret::createDataPartition</code> avec une proportion 70/30 (<code>p = 0.7</code>). Il est essentiel d’utiliser <code>set.seed()</code> pour s’assurer que la partition soit la même à chaque session de code (pour la reproductibilité) - j’ai l’habitude de taper n’importe quel numéro à environ 6 chiffres, mais lors de publications, je vais sur <a href="https://www.random.org/">random.org</a> et je génère un numéro au hasard, sans biais.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">68017</span>)
 id_tr &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(veggies_ilr<span class="op">$</span>Culture, <span class="dt">p =</span> <span class="fl">0.7</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)
@@ -313,13 +315,14 @@ pred_te &lt;-<span class="st"> </span><span class="kw">predict</span>(clf, <span
 ##   Courgine                  0       40         0        0
 ##   PanetRave                 3        0        39        0
 ##   PommeMer                  0        0         0       33</code></pre>
-<p>Les espèces sont toutes classées en entraînement, mais quelques rares erreurs surviennent en test.</p>
+<p>Les espèces sont toutes classées en entraînement, mais quelques rares erreurs surviennent en test. Pas mal comme classement!</p>
+<p><img src="https://media.giphy.com/media/KxVA4LQTFJp7y/giphy.gif" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="les-processus-gaussiens" class="section level2">
 <h2><span class="header-section-number">3.6</span> Les processus gaussiens</h2>
 <p>Les prédictions que nous avons obtenues des KNN sont des catégories, mais on aurait pu aussi prédire des nombres réels. Dans les cas où la crédibilité de la réponse est importante, il devient pertinent que la sortie soit probabiliste: les prédictions seront alors présentées sous forme de distributions de probabilité. Les <strong>processus gaussiens</strong> snt en mesure de prédire des distributions (prédictions probabilistes).</p>
-<p>Le principe des processus gaussiens est, à l’aide d’une matrice de covariance qui doit être définie (que l’on nomme le noyau), de générer une distribution multinormale, puis d’en sortir une distribution conditionnée sur les observations. Le processus est semblable à la modélisation de la variance courrament utilisée en géostatistiques. Pour plus de détails, référez-vous aux notes du cours <a href="https://essicolo.github.io/ecologie-mathematique-R/chapitre-ml.html"><em>Anayse et modélisation d’agroécosystèmes</em></a>. Retenez seulement que (1) la matrice de covariance a une influence capitale et que (2) vous devez standardiser (centrer et réduire) vos entrées et vos réponses.</p>
+<p>Le principe des processus gaussiens (<em>gaussian processes</em>, GP) est de générer une distribution multinormale (comprenant théoriquement une infinité de dimensions) à l’aide d’une matrice de covariance qui doit être définie (que l’on nomme le noyau) et d’un vecteur de moyenne (normalement composés de zéros pour une variable-réponse centrée), puis d’en sortir une distribution a posteriori conditionnée sur les observations. Les GP sont semblables à la modélisation de la variance courrament utilisée en géostatistiques. Pour plus de détails, référez-vous aux notes du cours <a href="https://essicolo.github.io/ecologie-mathematique-R/chapitre-ml.html"><em>Anayse et modélisation d’agroécosystèmes</em></a>. Pour l’instant, retenez que (1) la matrice de covariance a une influence capitale et que (2) vous devez préférablement standardiser (centrer et réduire) vos entrées et nécessairement vos réponses.</p>
 <div id="exemple-dapplication-1" class="section level3">
 <h3><span class="header-section-number">3.6.1</span> Exemple d’application</h3>
 <p>Les données de pollution en métaux lourds sur une rive de la rivière Meuse, en France, sont souvent utilisées pour les exemples d’application en prédiction spatiale. Nous allons utiliser les processus gaussiens (avec le module <strong><code>kernlab</code></strong>) pour prédire les <em>ilr</em> des métaux lourds à partir des coordonnées et de la distance de la rivière, en profitant de l’occasion pour cartographier avec les modules <strong><code>ggmap</code></strong> et <strong><code>sf</code></strong>. Notez que les ilr sont ici les variables-réponse, alors qu’ils étaient les variables d’entrée dans l’exemple précédent avec les KNN.</p>
@@ -511,10 +514,9 @@ meuse_pred_comp &lt;-<span class="st"> </span>meuse_pred_comp <span class="op">%
          <span class="st">&quot;copper&quot;</span> =<span class="st"> &quot;V2&quot;</span>,
          <span class="st">&quot;lead&quot;</span> =<span class="st"> &quot;V3&quot;</span>,
          <span class="st">&quot;zinc&quot;</span> =<span class="st"> &quot;V4&quot;</span>,
-         <span class="st">&quot;Fv&quot;</span> =<span class="st"> &quot;V5&quot;</span>)</code></pre>
-<pre><code>## Warning: `as_tibble.matrix()` requires a matrix with column names or a `.name_repair` argument. Using compatibility `.name_repair`.
-## This warning is displayed once per session.</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Fusionner avec le tableau de prédiction</span>
+         <span class="st">&quot;Fv&quot;</span> =<span class="st"> &quot;V5&quot;</span>)
+
+<span class="co"># Fusionner avec le tableau de prédiction</span>
 meuse_pred_comp &lt;-<span class="st"> </span><span class="kw">bind_cols</span>(meuse_pred, meuse_pred_comp)</code></pre>
 <p>Enfin, nous pouvons projeter les résultats sur notre carte pour chaque point de la grille.</p>
 <pre class="sourceCode r"><code class="sourceCode r">gg_cd &lt;-<span class="st"> </span><span class="kw">ggmap</span>(meuse_map) <span class="op">+</span>
@@ -545,6 +547,8 @@ cowplot<span class="op">::</span><span class="kw">plot_grid</span>(gg_cd, gg_cu,
 Figure 3.5: Prédiction spatiale des métaux lourds sur une rive de la rivière Meuse.
 </p>
 </div>
+<p><img src="https://media.giphy.com/media/wFxEA22DwZUmk/giphy.gif" style="display: block; margin: auto;" /></p>
+<p>Tu as raison, Bugs. Ça suffit pour aujourd’hui.</p>
 
 </div>
 </div>

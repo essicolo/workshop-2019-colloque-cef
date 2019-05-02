@@ -12,6 +12,18 @@ output: bookdown::gitbook
 
 # L'analyse compositionnelle
 
+```{r fig.align="center", echo = FALSE}
+knitr::include_graphics("https://media.giphy.com/media/frijtwtnqA9RC/giphy.gif")
+```
+
+Non-non, Bugs. Nous n'allons pas composer de la musique, mais apprendre à transformer des données qui font partie d'un tout.
+
+```{r fig.align="center", echo = FALSE}
+knitr::include_graphics("https://media.giphy.com/media/zbzyZ1E8W4IGA/giphy.gif")
+```
+
+Oh non, Bugs. Nous n'allons pas travailler sur la portée, mais bien en langage R. Par ailleurs, les fichiers de calculs qui génèrent ces notes sont [disponibles sur GitHub](https://github.com/essicolo/workshop-2019-colloque-cef).
+
 ## Contexte
 
 En 1898, le statisticien Karl Pearson nota que des corrélations étaient induites lorsque l'on effectuait des ratios par rapport à une variable commune.
@@ -33,7 +45,11 @@ plot(bones)
 cor(bones)
 ```
 
-Nous avons induit ce que Pearson appelait une fausse corrélation (*spurious correlation*). En 1960, [Chayes](https://doi.org/10.1029/JZ065i012p04185) proposa que ces fausses corrélations soient induites non seulement sur des ratios de valeurs absolues, mais aussi sur des ratios d'une somme totale. Par exemple, dans une composition simple de deux types d'utilisation du territoire, si une proportion augmente, l'autre doit nécessairement diminuer.
+```{r fig.align="center", echo = FALSE}
+knitr::include_graphics("https://media.giphy.com/media/119bUfqfRYS0Ao/giphy.gif")
+```
+
+Pas de panique, Bugs. Nous avons induit ce que Pearson appelait une fausse corrélation (*spurious correlation*). En 1960, [Chayes](https://doi.org/10.1029/JZ065i012p04185) proposa que ces fausses corrélations soient induites non seulement sur des ratios de valeurs absolues, mais aussi sur des ratios d'une somme totale. Par exemple, dans une composition simple de deux types d'utilisation du territoire, si une proportion augmente, l'autre doit nécessairement diminuer.
 
 ```{r coda-2var, out.width="100%", fig.align="center", fig.cap="Complémentarité intrinsèque des données compositionnelles."}
 n <- 30
@@ -68,7 +84,7 @@ Les conséquences d'effectuer des statistiques linéaires sur des données compo
 
 Pour contourner ces problèmes, il faut d'abord aborder les données compositionnelles pour ce qu'elles sont: des données intrinsèquement multivariées. Elles sont un nuage de point multidimensionnel, et non pas une collection de variables individuelles. Ceci qui n'empêche pas d'effectuer des analyses consciencieusement sous des angles particuliers.
 
-Chargeons le module **`compositions`** (n'oubliez pas de l'installer au préalable) pour accéder à des données fictives de proportions de sable, limon et argile dans des sédiments.
+Chargeons le module **`compositions`** (n'oubliez pas de l'installer au préalable) pour accéder à des données fictives de proportions de sable, limon et argile dans des sédiments. Notez que j'utiliserai la programmation en pipelines typique de **`tidyverse`**.
 
 ```{r, message=FALSE, warning=FALSE}
 library("compositions")
@@ -189,6 +205,14 @@ source("lib/ilr-rotation-sbp.R")
 ```{r ilr-rotation, out.width="100%", fig.align="center", fig.cap="Rotation des axes obtenus selon trois SBP différentes.", echo = FALSE}
 knitr::include_graphics("images/00_ilr-rotation.png")
 ```
+
+En somme, la transformation par log-ratio consiste à exploser les données dans un espace libéré des contraintes compositionnelles.
+
+```{r fig.align="center", echo = FALSE}
+knitr::include_graphics("https://media.giphy.com/media/24FCRwxlrG5oENbaju/giphy.gif")
+```
+
+C'est exactement ça, Bugs!
 
 Pour les transformations inverses, c'est-à-dire pour passer de données transformées à des données exprimées dans l'échelle originale, vous pourrez utiliser les fonctions `alrInv`, `clrInv` et `ilrInv`. Dans tous les cas, si vous tenez à garder la trace de vos données dans leur format original, vous aurez avantage à ajouter à votre vecteur compositionnel la valeur de remplissage, constitué d'un amalgame des composantes non mesurées. Par exemple,
 
