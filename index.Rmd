@@ -5,7 +5,6 @@ description: "Notes de conférence pour le 13ième Colloque du CEF"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
-favicon: "favicon.ico"
 output: bookdown::gitbook
 # bookdown::render_book("index.Rmd", "bookdown::gitbook")
 ---
@@ -47,7 +46,7 @@ cor(bones)
 
 Pourtant, si j'utilise des ratios allométriques avec l'humérus comme base,
 
-```{r}
+```{r allom-os, out.width="100%", fig.align="center", fig.cap="Corrélation entre relations allométriques d'attributs générés au hasard."}
 bones_r <- bones %>% 
   transmute(fh = femur/humerus,
             th = tibia/humerus)
