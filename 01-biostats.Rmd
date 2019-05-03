@@ -158,6 +158,21 @@ plot(granu_comp)
 lines(pred_comp, col = "red")
 ```
 
+Ou bien,
+
+```{r}
+plot(pred_comp[, 1], -ArcticLake[, 4], type = "l", xlim = c(0, 0.6))
+points(ArcticLake[, 1]/100, -ArcticLake[, 4], pch = 2)
+
+lines(pred_comp[, 2], -ArcticLake[, 4], col = "red")
+points(ArcticLake[, 2]/100, -ArcticLake[, 4], col = "red", pch = 5)
+
+lines(pred_comp[, 3], -ArcticLake[, 4], col = "blue")
+points(ArcticLake[, 3]/100, -ArcticLake[, 4], col = "blue", pch = 4)
+```
+
+Oui-oui, ce sont des lignes droite dans un espace courbe!
+
 ### Les compositions comme variables explicatives
 
 Disons que j'aimerais voir quel est l'effet de la compostion chimique d'un humus sur son pH.
