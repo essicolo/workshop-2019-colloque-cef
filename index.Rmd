@@ -9,7 +9,7 @@ output: bookdown::gitbook
 # bookdown::render_book("index.Rmd", "bookdown::gitbook")
 ---
 
-# L'analyse compositionnelle
+# L'analyse compositionnelle {#chapitre-intro-coda}
 
 ```{r fig.align="center", echo = FALSE}
 knitr::include_graphics("https://media.giphy.com/media/frijtwtnqA9RC/giphy.gif")
@@ -169,7 +169,7 @@ cen_lr %>%
 
 Enfin, une autre méthode de transformation développée par Egoscue et al. (2003), les log-ratios isométriques (ou *isometric log-ratios, ilr*) projette les compositions comprenant D composantes dans un espace restreint de D-1 dimensions orthonormées. Ces dimensions doivent doivent être préalablement établie dans un dendrogramme de bifurcation, où chaque composante ou groupe de composante est successivement divisé en deux embranchement. La manière d'arranger ces balances importe peu, mais on aura avantage à créer des balances interprétables.
 
-Le diagramme de balances peut être encodé dans une partition binaire séquentielle (ou *sequential bianry partition, sbp*). Une *sbp* est une matrice de contrastes orthogonaux ou chaque ligne représente une partition entre deux variables ou groupes de variables. Une composante étiquettée `+1` correspondra au groupe du numérateur, une composante étiquettée `-1` au dénominateur et une composante étiquettée `0` sera exclue de la partition ([Parent et al., 2013](http://dx.doi.org/10.3389/fpls.2013.00039)). J'ai reformulé la fonction CoDaDendrogram pour que l'on puisse ajouter des informations intéressantes sur les balants horizontaux. Cette fonction est disponible sur github.
+Le diagramme de balances, ou dendrogramme compositionnel, peut être encodé dans une partition binaire séquentielle (ou *sequential bianry partition, sbp*). Une *sbp* est une matrice de contrastes orthogonaux ou chaque ligne représente une partition entre deux variables ou groupes de variables. Une composante étiquettée `+1` correspondra au groupe du numérateur, une composante étiquettée `-1` au dénominateur et une composante étiquettée `0` sera exclue de la partition ([Parent et al., 2013](http://dx.doi.org/10.3389/fpls.2013.00039)). J'ai reformulé la fonction CoDaDendrogram pour que l'on puisse ajouter des informations intéressantes sur les balants horizontaux. Cette fonction est disponible sur github.
 
 ```{r  coda-dendrogram, out.width="100%", fig.align="center", fig.cap="Dendrogramme compositionnel: de la surface (rouge) vers la profondeur (bleu)."}
 source("https://raw.githubusercontent.com/essicolo/AgFun/master/codadend2.R")
@@ -242,6 +242,19 @@ iso_lr <- ilr(comp) # avec une sbp par défaut
 ilrInv(iso_lr)
 ```
 
+Les variables générée par les transformations compositionnelles doivent être interprétées avec précaution.
+
+- Un *alr* (log-ratio additif) est le log d'une proportion relative à une autre. Un vecteur d'*alr* est un point projeté dans un hyperespace compositionnel dont les axes sont à angle aigu (60 degrés): les distances entre les points ne sont pas euclidiennes.
+- Un *clr* (log-ratio centré) est le log d'une propostion relative à la moyenne (géométrique) des proportions. Les angles entre les axes d'un vecteur de *clr* sont orthogonaux. Néanmoins la somme de chaque vecteur de *clr* étant de 0, sa matrice de covariance ne peut pas être inversée (singularité), ce qui rend notamment impossible le calcul de la distance de Mahalanobis et de certains autres calculs géostatistiques.
+- Un *ilr* (log-ratio isométrique) est le log normé du ration entre deux proportions ou moyenne géométrique d'un ensemble de proportions. Les angles entre les axes d'un vecteur de *ilr* sont orthogonaux et la matrice de covariance peut être inversée, mais la définition des axes comme balance entre des proportions ou groupes de proportions est souvent difficile à interpréter.
+
+Étant donnée que les données compositionnelles sont *intrinsèquement multivariées*, chaque variable qui compose un vecteur compositionnel, transformé ou non, constitue une perspective particulière d'un nuage de points. Or une collection des perspectives individuelles reste une appréciation grossière d'un espace multivarié.
+
+La transformation à privilégié dépendra de l'analyse que vous entreprendrez. Toutefois, [Filzmoser et al. (2018)](https://doi.org/10.1007/978-3-319-96422-5) recommande les transformations *ilr*.
+
+> [The] Euclidean vector space structure [of isometric log-ratios] enables to construct coordinates with respect to a basis, eventually coefficients of a generating system. Here, isometric logratio coordinates, real coordinates with respect to an orthonormal basis in the Aitchison geometry, are preferable.
+> - [Filzmoser et al. (2018)](https://doi.org/10.1007/978-3-319-96422-5)
+
 ## Les zéros
 
 Les proportions négatives ou plus imposantes que le tout sont exclues. De même, une proportion de 100%, occupant tout le simplex, implique que les proportions complémentaires soient nulles. Or, le log de 0 est $-\infty$, ce qui dispose de la possibilité d'effectuer des transformations logarithmiques. En fait, les données compositionnelles sont exprimées *entre* 0 et la somme totale, ce qui exclut la possibilité d'obtenir des proportions de 0% ou de 100%. Or, il arrive souvent qu'un tableau de données inclut des 0. Dans ce cas, on doit mener une réflexion sur la nature des valeurs nulles.
@@ -300,4 +313,4 @@ Dans le cas des OTU, il arrive souvent d'obtenir au-dessus de 90% de zéros. Une
 
 Il peut arriver que les zéros soient générés par les mécanismes étudiés, non pas des erreurs de mesure. Par exemple, certaines espèces peuvent ne pas occuper certaines aires cadrillées parce qu'elles sont structurellement exclues de leur niche écologique (une épinette dans un lac ou la proportion de viande au menu d'une famille véganne). Pour ce type de zéro, il n'y a pas de réponse facile. De même que précédemment, il pourrait être possible de procéder à l'amalgamation. Une méthode conviviale est de séparer l'analyse en différents groupes (par exemple, on décompte généralement des espèces différentes sur terre et dans un lac).
 
-Si vos données font partie d'un tout, je vous recommande chaudement d'utiliser des méthodes compositionnelles autant pour l'analyse que la modélisation. Pour en savoir davantage, le livre *Compositional data analysis with R*, de [van den Boogart et Tolosana-Delgado (2013)](https://doi.org/10.1007/978-3-642-36809-7) pourra vous guider, quoi que je recommande davantage le plus récent et à mon avis mieux vulgarisé [*Applied Compositional Data Analysis With Worked Examples in R*], de [Filzmoser et al. (2018)](https://doi.org/10.1007/978-3-319-96422-5).
+Si vos données font partie d'un tout, je vous recommande chaudement d'utiliser des méthodes compositionnelles autant pour l'analyse que la modélisation. Parmi les trois transformations présentées,  Pour en savoir davantage, le livre *Compositional data analysis with R*, de [van den Boogart et Tolosana-Delgado (2013)](https://doi.org/10.1007/978-3-642-36809-7) pourra vous guider, quoi que je recommande davantage le plus récent et à mon avis mieux vulgarisé [*Applied Compositional Data Analysis With Worked Examples in R*], de [Filzmoser et al. (2018)](https://doi.org/10.1007/978-3-319-96422-5).

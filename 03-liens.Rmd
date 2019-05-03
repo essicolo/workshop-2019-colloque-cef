@@ -1,6 +1,0 @@
-# Liens utiles
-
-- Diagrammes ternaires
-  - **`ggtern`**.
-  - **`soilTexture`**
-- Cours d'[**Analyse et modélisation d'agroécosystèmes**](https://essicolo.github.io/ecologie-mathematique-R) (GAE-7007, Université Laval)

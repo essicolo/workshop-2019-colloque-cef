@@ -1,1 +1,288 @@
-# Les biostats compositionnelles
+# L'analyse de données compositionnelles {#chapitre-analyse}
+
+Nous avons vu au chapitre \@ref(chapitre-intro-coda) que les données compositionnelles doivent subir une transformation préalable en vue d'être analysées et modélisées. S'il
+faut être prudent sur l'interprétation des variables transformées, il faut aussi l'être sur les statistiques qui leur sont associées. En effet, les variables ayant subit une transformation compositionnelle peuvent être intégrés dans des flux de calculs en biostatistiques (tests d'hypothèses, modèles linéaires ou non linéaires, etc.) ou en bioheuristique (partitionnement, ordination, etc.), en passant par la détection de valeurs aberrantes et l'imputation de données manquantes.
+
+## Imputation de données manquantes
+
+Pour toutes sortes de raison, il arrive parfois que des données soient manquantes. Les données manquantes se répartissent selon différents cas de figures ([Graham, 2012](https://www.springer.com/us/book/9781461440178); [Little et Rubin, 2002](https://onlinelibrary.wiley.com/doi/book/10.1002/9781119013563)) dont trois principaux:
+
+- les valeurs manquantes univariées: pour une variable donnée, si une observation est absente, alors toutes les observations suivantes pour cette variable sont absentes (figure \@ref(fig:mv-types)a).
+- les valeurs manquantes monotones: la valeur d'une variable $Y_j$ manquante pour un individu $i$ implique que toutes les variables suivantes $Y_k$ ($k > j$) sont manquantes pour cet individu (figure \@ref(fig:mv-types)b).
+- les valeurs manquantes arbitraires: la matrice ne dessine spécifiquement aucune des formes précédentes (figure \@ref(fig:mv-types)c).
+
+```{r mv-types, out.width='100%', fig.align='center', fig.cap="Exemple de profils de données manquantes", echo = FALSE}
+knitr::include_graphics('images/08_mv-types.png')
+```
+
+Le module VIM permet de visualiser la structure des données manquantes.
+
+```{r echo = FALSE}
+library("VIM")
+library("tidyverse")
+```
+
+Pour l'exemple, prenons le tableau `coffee`, qui comprend la composition chimique de plusieurs échantillons associés à un cultivar, puis remplaçons au hasard des données par des valeurs manquantes (`NA`), puis vérifions les proportions de données manquantes et les proportions de combinaisons de données manquantes.
+
+```{r vim-diag, out.width="100%", fig.align="center", fig.cap="Portrait des valeurs manquantes avec **`VIM`**."}
+set.seed(867209)
+data("coffee", package = "robCompositions")
+coffee_NA <- coffee
+n_NA <- 15
+row_NA <- sample(1:nrow(coffee), n_NA, replace = TRUE)
+col_NA <- sample(2:ncol(coffee), n_NA, replace = TRUE)
+for (i in 1:n_NA) coffee_NA[row_NA[i], col_NA[i]] <- NA
+
+summary(aggr(coffee_NA, sortVar = TRUE))
+```
+
+Pour imputer les valeurs manquantes, une méthode commune est d'inspecter les valeurs des vecteurs les plus proches ne manquant pas la donnée en question et d'imputer la moyenne ou la médiane de ces valeurs (algoritmhe des KNN, que nous verrons toute à l'heure). La notion de "plus proche" imlique le calcul d'une distance. Or les distances entre compositions sont peu fiables. On pourrait imputer des *ilr*, mais le changement d'un *ilr* entraînera une perturbation d'au moins une autre concentration. La fonction `robCompositions::impCoda()` utilise des méthodes robustes pour imputer directement les compositions.
+
+```{r,message=FALSE, warning=FALSE, results=FALSE}
+library("robCompositions")
+coffee_imp <- impCoda(coffee_NA[, -1])$xImp
+coffee_imp
+```
+
+## Détection de valeurs aberrantes
+
+Les valeurs aberrantes peuvent avoir un effet important sur les stats. Elles sont aussi parfois une occasion d'inspecter les données et de détecter des mécanismes jusqu'alors insoupsonnés. Les données aberrantes peuvent avantageusement être détectées sur des données transformées. Encore faut-il utiliser des statistiques robustes.
+
+```{r robuste, out.width="100%", fig.align="center", fig.cap="Valeurs manquantes sans (rouge) et avec (vert) méthodes robustes."}
+library("mvoutlier")
+library("ellipse")
+library("ggtern")
+data("coffee")
+sbp <- matrix(c(1, 1,-1,
+                1,-1, 0),
+              ncol = 3,
+              byrow = TRUE)
+coffee_comp <- coffee %>% 
+  dplyr::select(acit, metpyr, furfu) %>% 
+  acomp() %>% 
+  as_tibble()
+coffee_ilr <- coffee_comp %>%
+  ilr(., V = gsi.buildilrBase(t(sbp))) %>%
+  as_tibble(.) %>%
+  dplyr::rename(furfu_metpyr.acit = V1,
+                metpyr_acit = V2)
+
+elldev_ilr <- ellipse(x = cov(coffee_ilr),
+                      centre = apply(coffee_ilr, 2, mean),
+                      level = 0.975) %>% 
+  as_tibble()
+
+mcd <- covMcd(coffee_ilr)
+elldev_ilr_rob <- ellipse(x = mcd$cov,
+                          centre = mcd$center,
+                          level = 0.975) %>% 
+  as_tibble()
+
+coffee_ilr %>%
+  ggplot(mapping = aes(x = furfu_metpyr.acit, y = metpyr_acit)) +
+  geom_point() +
+  geom_path(data = elldev_ilr, aes(x = furfu_metpyr.acit, y = metpyr_acit), colour = "red") +
+  geom_path(data = elldev_ilr_rob, aes(x = furfu_metpyr.acit, y = metpyr_acit), colour = "green")
+
+```
+
+Les fonctions `mvoutlier::sign1()` et `mvoutlier::sign2()` utilise justement les méthodes robustes pour détecter des valeurs aberrantes. La méthode `mvoutlier::sign1()` sebase sur les composantes principales robustes.
+
+```{r outliers, out.width="100%", fig.align="center", fig.cap="Valeurs manquantes sans (rouge) et avec (vert) méthodes robustes."}
+coffee_ilr <- coffee_ilr %>% 
+  mutate(is_outlier = sign2(as.matrix(.), qcrit = 0.975)$wfinal01 == 0)
+
+coffee_ilr %>%
+  ggplot(mapping = aes(x = furfu_metpyr.acit, y = metpyr_acit)) +
+  geom_point(mapping = aes(colour = is_outlier)) +
+  geom_path(data = elldev_ilr, aes(x = furfu_metpyr.acit, y = metpyr_acit), colour = "red") +
+  geom_path(data = elldev_ilr_rob, aes(x = furfu_metpyr.acit, y = metpyr_acit), colour = "green")
+
+```
+
+## Biostats compositionnelles
+
+La régression linéaire est une des méthodes statistiques les plus communes. Elle permet d'apprécier les effets de variables explicatives sur des variables-réponse. À cet égard, les compositions peuvent autant expliquer que servir de variable de sortie.
+
+### Les compositions comme variables-réponse
+
+Les données `ArcticLake` présentent la granulo pour différentes profondeurs de sédiments. La profondeur peut-être expliquer la granulo? Nous allons d'abord transformer la texture en *ilr*.
+
+```{r}
+data("ArcticLake")
+granu_comp <- acomp(ArcticLake[, -4])
+sbp <- matrix(c(1, 1,-1,
+                1,-1, 0),
+              ncol = 3,
+              byrow = TRUE)
+granu_ilr <- ilr(granu_comp, V = gsi.buildilrBase(t(sbp))) %>% as_tibble() %>% 
+  mutate(depth = ArcticLake[, 4])
+names(granu_ilr)[1:2] <- c("c_sS", "s_S")
+```
+
+Nous avons ici deux sorties (balances [c | s,S] et [s | S]) et une entrée (la profondeur). Créons deux modèles.
+
+```{r}
+mod1 <- lm(c_sS ~ depth, granu_ilr)
+mod2 <- lm(s_S ~ depth, granu_ilr)
+```
+
+Inspectons le modèle 1.
+
+```{r}
+summary(mod1)
+```
+
+L'intercept est la valeur de la balance [c | s,S] à profondeur nulle. Une balance positive montre que l'argile prend moins de place dans la composition que la moyenne géométrique du limon et du sable. La pente négative montre que la balance tend à diminuer en profondeur, c'est à dire que l'argile prend relativement de plus en plus de place en profondeur.
+
+Prédisons nos *ilr*.
+
+```{r}
+pred1 <- predict(mod1)
+pred2 <- predict(mod2)
+
+par(mfrow = c(1, 2))
+plot(granu_ilr$c_sS, -granu_ilr$depth)
+lines(pred1, -granu_ilr$depth, col = "red")
+plot(granu_ilr$s_S, -granu_ilr$depth)
+lines(pred2, -granu_ilr$depth, col = "red")
+
+```
+
+Les modèles linéaires ne sont vraisemblabelment pas adéquats: on aurait avantage à transformer la profondeur en log. Mais passons. Le fait est que l'on peut transformer nos deux prédictions en composition, puis présenter une régression linéaire dans un diagramme ternaire.
+
+```{r}
+pred_comp <- ilrInv(cbind(pred1, pred2), V = gsi.buildilrBase(t(sbp)))
+
+plot(granu_comp)
+lines(pred_comp, col = "red")
+```
+
+### Les compositions comme variables explicatives
+
+Disons que j'aimerais voir quel est l'effet de la compostion chimique d'un humus sur son pH.
+
+```{r}
+data("humus")
+humus_comp <- humus %>% 
+  dplyr::select(C, N, P, K, Ca, Mg) %>% 
+  mutate(Fv = 1e6 - C - N - P - K - Ca - Mg) %>% 
+  acomp(.)
+sbp <- matrix(c( 1, 1, 1, 1, 1, 1,-1,
+                 -1, 1, 1, 1, 1, 1, 0,
+                 0, 1, 1,-1,-1,-1, 0,
+                 0, 1,-1, 0, 0, 0, 0,
+                 0, 0, 0, 1,-1,-1, 0,
+                 0, 0, 0, 0, 1,-1, 0),
+              byrow = TRUE, ncol = 7)
+CoDaDendrogram(humus_comp, V = gsi.buildilrBase(t(sbp)))
+```
+
+La SBP est structurée pour exclure d'abord l'amalgamation Fv dans la balance [Fv | C,Mg,Ca,K,P,N]. Puis, J'exclue le carbone des nutriments dans [C | Mg,Ca,K,P,N]. La balance suivante, [Mg,Ca,K | P,N], est un log-ratio entre anions et cations. Ensuite, le Redfield-ratio est exprimé par la balance [P | N]. Puis je balance les cations selon leur valence dans [Mg,Ca | K]. La balance restante est [Mg | Ca].
+
+Calculons les ilr puis lançons le modèle linéaire.
+
+```{r}
+humus_ilr <- ilr(humus_comp, V = gsi.buildilrBase(t(sbp))) %>% 
+  as_tibble()
+```
+
+J'ai conçu un petit algorithme pour définit les balances. Pour l'utiliser, il faut exécuter son code et il faut que la SBP ait des noms de colonne.
+
+```{r}
+source("https://raw.githubusercontent.com/essicolo/AgFun/master/ilrDefinition.R")
+colnames(sbp) <- colnames(humus_comp)
+names(humus_ilr) <- ilrDefinition(sbp, "-+")
+```
+
+J'ajoute la colonne `pH` au tableau d'*ilr*, puis je lance le modèle linéaire.
+
+```{r}
+humus_ilr <- humus_ilr %>% 
+  mutate(pH = humus$pH)
+modlin <- lm(pH ~ ., humus_ilr)
+summary(modlin)
+```
+
+L'intercept est la valeur du pH lorsque toutes les balances sont nulles. Cette information n'est pas intéressante. Quant aux pentes, on pourra les interpréter comme suit. Une pente positive de `{r} round(coef(modlin)[3], 5)` sur la variable [C | Mg,Ca,K,P,N] signifie que plus la balance est élevée, plus le pH est élevé. Une balance plus élevée signifie que la moyenne géométrique du numérateur [Mg,Ca,K,P,N] gagne de plus en plus en importance par rapport que celle du dénominateur [C].
+
+De même, une pente de `{r} round(coef(modlin)[6], 5)` indique qu'à chaque fois que la balance [Mg,Ca | K] augmente de 1 unité (c'est ce qui se passerait si K augmenterait ou que Mg et/ou Ca diminuerait), le pH diminue  de `{r} round(coef(modlin)[6], 5)`.
+
+Les coefficients de pente, qui sont des perspectives exprimées en balances, changeraient si la sbp était différente, mais la régression serait la même (même intercept, même R²). On pourra même transformer les pente en une composition pour obtenir ce que l'on appelle une *perturbation* ([Filzmoser et al. (2018)](https://doi.org/10.1007/978-3-319-96422-5), chapitre 3.2).
+
+```{r}
+ilrInv(coef(modlin)[-1], V = gsi.buildilrBase(t(sbp)))
+```
+
+## Bioheuristique compositionnelle
+
+### Partitionnement
+
+La distance entre deux compositions est un distance d'Aitchison. Cette distance est une distance euclidienne calculée sur des *clr* ou des *ilr*. Les distances n'étant pas affectées pas la formulation de la sbp, je me permets d'utiliser une sbp quelconque.
+
+```{r}
+coffee_ilr2 <- coffee %>% 
+  dplyr::select(-sort) %>% 
+  ilr(.) %>% 
+  as_tibble()
+
+coffee_aitdist <- coffee_ilr2 %>% 
+  dist(., method = "euclidian")
+```
+
+La distance permet notamment d'effectuer du partitionnement (*clustering*, je vous réfère aux [notes de mon cours GAE-7007](https://essicolo.github.io/ecologie-mathematique-R/chapitre-ordination.html#partitionnement) pour plus de détails sur le partitionnement). 
+
+```{r}
+coffee_clust <- as.dendrogram(hclust(coffee_aitdist, method = "average"))
+library("dendextend") # pour colorer les feuilles
+labels_colors(coffee_clust) <- as.numeric(coffee$sort)
+plot(coffee_clust)
+```
+
+Les échantillons 6 et 15 semblent mal classés, mais somme toute, c'est pas mal!
+
+### La distance d'Aitchison par rapport au barycentre est une diversité
+
+Notez que la distance d'Aitchison par rapport au barycentre d'une composition (où toutes les proportions sont égales) est un indicateur de diversité.
+
+Je créé une grille sur laquelle je vais calculer des indicateurs de diversité.
+
+```{r}
+n <- 10000
+p1 <- runif(n, min=0, max=1)
+p2 <- runif(n, min=0, max=1)
+p3 <- runif(n, min=0, max=1)
+comp_grid <- tibble(p1, p2, p3)
+ilr_grid <- ilr(comp_grid)
+```
+
+Puis je calcule la distance d'Aitchison par rapport au barycentre.
+
+```{r}
+library("vegan")
+
+ilr_grid <- ilr(comp_grid)
+comp_grid <- comp_grid %>% 
+  mutate(aitdist = sqrt(ilr_grid[, 1]^2 + ilr_grid[, 2]^2),
+         shannon = diversity(., index = "shannon"))
+```
+
+Les graphiques sont crées ici avec **`ggtern`**.
+
+```{r}
+library("ggtern")
+gg_aitdist <- ggtern(data = comp_grid, aes(p1, p2, p3)) +
+  geom_point(aes(colour = aitdist)) +
+  scale_colour_viridis_c(option = "inferno", direction = 1)
+
+gg_shannon <- ggtern(data = comp_grid, aes(p1, p2, p3)) +
+  geom_point(aes(colour = shannon)) +
+  scale_colour_viridis_c(option = "inferno", direction = -1)
+cowplot::plot_grid(gg_aitdist, gg_shannon)
+```
+
+
+### Ordination
+
+Exercice d'analyse discriminante sur l'ionome.
+
